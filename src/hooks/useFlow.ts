@@ -18,9 +18,10 @@ export const useFlow = (automation: Automation) => {
   const initialNodes = automation.components.map((component, index) => {
     const content = mapContentToObject(component.content);
     return {
+      
       id: component.id,
       type: 'custom',
-      data: { ...content, type: component.type_object },
+      data: { ...content, type: component.type_object, automationId: automation.id, },
       position: { x: 250, y: 5 + index * 100 },
     }
   });
@@ -56,10 +57,11 @@ export const useFlow = (automation: Automation) => {
         y: event.clientY,
       });
       const newNode = {
+        
         id: uuidv4(),
         type: 'custom',
         position,
-        data: { label: `${type} node`, type },
+        data: { label: `${type} node`, type, automationId: automation.id },
       };
  
       setNodes((nds) => nds.concat(newNode));
@@ -83,5 +85,6 @@ export const useFlow = (automation: Automation) => {
     onDragOver,
     onDrop,
     onDragStart,
+    setNodes,
   };
 }; 

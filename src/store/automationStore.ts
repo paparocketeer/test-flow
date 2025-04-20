@@ -8,6 +8,8 @@ interface AutomationStore {
   error: string | null;
   fetchAutomations: () => Promise<void>;
   deleteAutomation: (id: string) => void;
+  updateAutomationById: (automationId: string, nodeId: string, value: string, field: string) => void;
+  deleteComponent: (automationId: string, nodeId: string) => void;
 }
 
 const fetchAutomations = async () => {
@@ -39,6 +41,25 @@ export const useAutomationStore = create<AutomationStore>((set) => ({
       automations: state.automations.filter(automation => automation.id !== id)
     }));
   },
+  updateAutomationById: (automationId: string, nodeId: string, value: string, field: string) => 
+    set((state) => ({
+      automations: state.automations.map(automation => 
+        automation.id === automationId ? { ...automation, components: automation.components.map(component => 
+          component.id === nodeId ? { ...component, content: component.content.map(content => 
+            content.id === field ? { ...content, value } : content
+          ) } : component
+        ) } : automation
+      )
+    })),
+  deleteComponent: (automationId: string, nodeId: string) => 
+    set((state) => ({
+      automations: state.automations.map(automation => 
+        automation.id === automationId ? {
+          ...automation,
+          components: automation.components.filter(component => component.id !== nodeId)
+        } : automation
+      )
+    })),
 }));
 
 // Initial fetch

@@ -1,15 +1,31 @@
 import { memo } from 'react';
 import { Handle, Position, useReactFlow } from '@xyflow/react';
 import InputMask from 'react-input-mask';
+import { format, parse } from 'date-fns';
+import { useAutomationStore } from '@/store/automationStore';
 
-const CustomNode = ({ data, id }: { data: { label: string; type: string, value: string, options?: { id: string; label: string; }[] }, id: string }) => {
+const CustomNode = ({ data, id }: { data: { label: string; type: string, value: string, options?: { id: string; label: string; }[], automationId: string }, id: string }) => {
   const { setNodes, setEdges } = useReactFlow();
-
+  const updateAutomationById = useAutomationStore(state => state.updateAutomationById);
+  const deleteComponent = useAutomationStore(state => state.deleteComponent);
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     setNodes((nodes) => nodes.filter((node) => node.id !== id));
     setEdges((edges) => edges.filter((edge) => edge.source !== id && edge.target !== id));
+    deleteComponent(data.automationId, id);
   };
+
+  const handleValueChange = (value: string, field: string) => {
+    setNodes((nodes) => nodes.map((node) => {
+      if (node.id === id) {
+        return { ...node, data: { ...node.data, value } };
+      }
+      return node;
+    }));
+    updateAutomationById(data.automationId, id, value, field);
+  };
+
+  console.log('CustomNode', { data, id });
 
   const getNodeContent = () => {
     switch (data.type) {
@@ -22,8 +38,8 @@ const CustomNode = ({ data, id }: { data: { label: string; type: string, value: 
                 mask="999:99"
                 maskChar={null}
                 className="text-sm text-[#666666] bg-transparent outline-none w-16"
-                defaultValue="000:00"
-                onChange={(e) => console.log(e.target.value)}
+                defaultValue={data.value}
+                onChange={(e) => handleValueChange(e.target.value, 'duration_minutes')}
               />
             </div>
           </>
@@ -37,8 +53,8 @@ const CustomNode = ({ data, id }: { data: { label: string; type: string, value: 
                 mask="999:99"
                 maskChar={null}
                 className="text-sm text-[#666666] bg-transparent outline-none w-16"
-                defaultValue="000:00"
-                onChange={(e) => console.log(e.target.value)}
+                defaultValue={data.value}
+                onChange={(e) => handleValueChange(e.target.value, 'duration_minutes')}
               />
             </div>
           </>
@@ -48,7 +64,12 @@ const CustomNode = ({ data, id }: { data: { label: string; type: string, value: 
           <>
             <span className="text-sm font-medium text-[#1A1A1A]">Дата диалога от</span>
             <div className="flex items-center gap-2 px-3 py-2 border border-[#CCCCCC] rounded-lg">
-              <span className="text-sm text-[#666666]">01.01.2025</span>
+              <input
+                type="date"
+                className="text-sm text-[#666666] bg-transparent outline-none"
+                value={data.value ? format(parse(data.value, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd') : ''}
+                onChange={(e) => handleValueChange(format(new Date(e.target.value), 'dd.MM.yyyy'), 'duration_minutes')}
+              />
             </div>
           </>
         );
@@ -57,20 +78,24 @@ const CustomNode = ({ data, id }: { data: { label: string; type: string, value: 
           <>
             <span className="text-sm font-medium text-[#1A1A1A]">Дата диалога до</span>
             <div className="flex items-center gap-2 px-3 py-2 border border-[#CCCCCC] rounded-lg">
-              <span className="text-sm text-[#666666]">01.01.2025</span>
+              <input
+                type="date"
+                className="text-sm text-[#666666] bg-transparent outline-none"
+                value={data.value ? format(parse(data.value, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd') : ''}
+                onChange={(e) => handleValueChange(format(new Date(e.target.value), 'dd.MM.yyyy'), 'duration_minutes')}
+              />
             </div>
           </>
         );
-        case 'automation_agent':
+      case 'automation_agent':
         return (
           <>
             <div className='flex flex-col gap-2'>
-                <span className="text-sm font-medium text-[#000000]">{`Агент возражений ${data.label}`}</span>
-                <span className="text-sm text-[#666666]">Агент</span>
+              <span className="text-sm font-medium text-[#000000]">{`Агент возражений ${data.label}`}</span>
+              <span className="text-sm text-[#666666]">Агент</span>
             </div>
           </>
         );
-        
       case 'selected_marker':
         return (
           <>
@@ -79,9 +104,7 @@ const CustomNode = ({ data, id }: { data: { label: string; type: string, value: 
               <select
                 className="text-sm text-[#666666] bg-transparent outline-none w-full"
                 value={data.value}
-                onChange={(e) => {
-                  data.value = e.target.value;
-                }}
+                onChange={(e) => handleValueChange(e.target.value, 'value')}
               >
                 {data.options?.map((option: { id: string; label: string; }) => (
                   <option key={option.id} value={option.id}>
