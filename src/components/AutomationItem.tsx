@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
-import { ReactFlow, Controls, Background, ReactFlowProvider } from '@xyflow/react';
+import { ReactFlow, Controls, Background } from '@xyflow/react';
 import { Automation } from '@/api/types';
 import { useAutomationStore } from '@/store/automationStore';
 import { mapContentToObject } from '@/utils/contentMapper';
 import { useFlow } from '@/hooks/useFlow';
+import CustomNode from './CustomNode';
+
+const nodeTypes = {
+  custom: CustomNode,
+};
 
 interface AutomationItemProps {
   automation: Automation;
@@ -23,7 +28,7 @@ const AutomationItem: React.FC<AutomationItemProps> = ({ automation }) => {
     onDragOver,
     onDrop,
     onDragStart,
-  } = useFlow();
+  } = useFlow(automation);
 
   const toggleOpen = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -55,7 +60,7 @@ const AutomationItem: React.FC<AutomationItemProps> = ({ automation }) => {
           />
         </svg>
         <span className="text-lg font-medium flex-1">
-          {content.name}: {content.count_files} звонков
+          {content.label}: {content.count_files} звонков
         </span>
         <svg 
           className="w-5 h-5 cursor-pointer"
@@ -73,8 +78,7 @@ const AutomationItem: React.FC<AutomationItemProps> = ({ automation }) => {
         </svg>
       </div>
       {isOpen && (
-        
-        <div className="reactflow-wrapper" ref={reactFlowWrapper}>
+        <div className="reactflow-wrapper h-[438px] rounded" ref={reactFlowWrapper}>
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -84,6 +88,7 @@ const AutomationItem: React.FC<AutomationItemProps> = ({ automation }) => {
             onDrop={onDrop}
             onDragStart={onDragStart}
             onDragOver={onDragOver}
+            nodeTypes={nodeTypes}
             fitView
             style={{ backgroundColor: '#F7F9FB' }}
           >

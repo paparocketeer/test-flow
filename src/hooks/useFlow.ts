@@ -8,23 +8,31 @@ import {
 } from '@xyflow/react';
 import { useDnD } from '@/context/DnDContext';
 import { DragEvent } from 'react';
+import { Automation } from '@/api/types';
+import { mapContentToObject } from '@/utils/contentMapper';
+import { v4 as uuidv4 } from 'uuid';
 
-const initialNodes = [
-  {
-    id: '1',
-    type: 'input',
-    data: { label: 'input node' },
-    position: { x: 250, y: 5 },
-  },
-];
- 
-let id = 0;
-const getId = () => `dndnode_${id++}`;
 
-export const useFlow = () => {
+export const useFlow = (automation: Automation) => {
   const reactFlowWrapper = useRef(null);
+  const initialNodes = automation.components.map((component, index) => {
+    const content = mapContentToObject(component.content);
+    return {
+      id: component.id,
+      type: 'custom',
+      data: { ...content, type: component.type_object },
+      position: { x: 250, y: 5 + index * 100 },
+    }
+  });
+  const initialEdges = automation.components.map((component) => {
+    return {
+      id: uuidv4(),
+      source: component.target,
+      target: component.id,
+    }
+  });
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const { screenToFlowPosition } = useReactFlow();
   const [type, setType] = useDnD();
 
@@ -48,10 +56,10 @@ export const useFlow = () => {
         y: event.clientY,
       });
       const newNode = {
-        id: getId(),
-        type,
+        id: uuidv4(),
+        type: 'custom',
         position,
-        data: { label: `${type} node` },
+        data: { label: `${type} node`, type },
       };
  
       setNodes((nds) => nds.concat(newNode));

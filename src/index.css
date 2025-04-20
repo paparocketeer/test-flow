@@ -1,4 +1,4 @@
-@import url('@/theme.css');
+/* @import url('@/theme.css'); */
 @import "tailwindcss";
 
 :root {
@@ -55,7 +55,7 @@ body,
  
 .dndflow .reactflow-wrapper {
   flex-grow: 1;
-  height: 100%;
+  height: calc(100% - 60px);
 }
  
 .dndflow .selectall {

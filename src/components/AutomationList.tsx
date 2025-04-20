@@ -10,17 +10,15 @@ const AutomationList: React.FC = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className='w-full pt-[50px]'>
+    <div className='w-full pt-[50px] ml-[50px]'>
         {automations.map((automation) => (
-          <ReactFlowProvider>
+          <ReactFlowProvider key={automation.id}>
             <AutomationItem
-            key={automation.id}
-            automation={automation}
-          />
+              automation={automation}
+            />
           </ReactFlowProvider>
-          
         ))}
-      </div>
+    </div>
   );
 };
 
