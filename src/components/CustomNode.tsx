@@ -25,8 +25,6 @@ const CustomNode = ({ data, id }: { data: { label: string; type: string, value: 
     updateAutomationById(data.automationId, id, value, field);
   };
 
-  console.log('CustomNode', { data, id });
-
   const getNodeContent = () => {
     switch (data.type) {
       case 'call_duration_gte':
