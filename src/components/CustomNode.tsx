@@ -3,6 +3,7 @@ import { Handle, Position, useReactFlow } from '@xyflow/react';
 import InputMask from 'react-input-mask';
 import { format, parse } from 'date-fns';
 import { useAutomationStore } from '@/store/automationStore';
+import RobotIcon from './RobotIcon';
 
 const CustomNode = ({ data, id }: { data: { label: string; type: string, value: string, options?: { id: string; label: string; }[], automationId: string }, id: string }) => {
   const { setNodes, setEdges } = useReactFlow();
@@ -88,16 +89,19 @@ const CustomNode = ({ data, id }: { data: { label: string; type: string, value: 
       case 'automation_agent':
         return (
           <>
-            <div className='flex flex-col gap-2'>
-              <span className="text-sm font-medium text-[#000000]">{`Агент возражений ${data.label}`}</span>
-              <span className="text-sm text-[#666666]">Агент</span>
+            <div className='flex items-center gap-3'>
+              <RobotIcon />
+              <div className='flex flex-col gap-2'>
+                <span className="text-sm font-medium text-[#000000]">{`Агент возражений ${data.label}`}</span>
+                <span className="text-sm text-[#666666]">Агент</span>
+              </div>
             </div>
           </>
         );
       case 'selected_marker':
         return (
           <>
-            <span className="text-sm font-medium text-[#1A1A1A]">{data.label}</span>
+            <span className="text-sm font-medium text-[#1A1A1A]">Маркер</span>
             <div className="flex items-center gap-2 px-3 py-2 border border-[#CCCCCC] rounded-lg flex-1">
               <select
                 className="text-sm text-[#666666] bg-transparent outline-none w-full"
@@ -119,7 +123,7 @@ const CustomNode = ({ data, id }: { data: { label: string; type: string, value: 
   };
 
   return (
-    <div className="flex items-center gap-3 px-5 py-2 bg-white rounded shadow-[0px_0px_4px_0px_rgba(0,0,0,0.15)] relative">
+    <div className={`flex items-center gap-3 pl-3 pr-6 py-2 bg-white rounded shadow-[0px_0px_4px_0px_rgba(0,0,0,0.15)] relative ${data.type === 'automation_agent' ? 'border-l-4 border-l-[#52C41A]' : ''}`}>
       <Handle type="target" position={Position.Top} className="w-3 h-3 bg-[#CCCCCC] border-2 border-white" />
       {getNodeContent()}
       <Handle type="source" position={Position.Bottom} className="w-3 h-3 bg-[#CCCCCC] border-2 border-white" />
@@ -146,63 +150,3 @@ const CustomNode = ({ data, id }: { data: { label: string; type: string, value: 
 };
 
 export default memo(CustomNode);
-
-// {
-//   "id": "008e9a8a-3602-44d6-85ac-10bc3ea545ff",
-//   "id_uuid": "c7a6c470-ca31-40cc-9070-b2e982e761d9",
-//   "type_object": "automation_agent",
-//   "handler_type": false,
-//   "folded": true,
-//   "hidden": false,
-//   "content": [
-//     {
-//       "id": "name",
-//       "label": "Agent Name",
-//       "type": "text",
-//       "value": "12",
-//       "read_only": true,
-//       "options": null
-//     },
-//     {
-//       "id": "description",
-//       "label": "Agent Description",
-//       "type": "textarea",
-//       "value": "12",
-//       "read_only": true,
-//       "options": null
-//     }
-//   ],
-//   "target": "f3ffa836-8316-41cd-b2ac-80076349c184",
-//   "description": null
-// }
-
-// {
-//   "id": "f3ffa836-8316-41cd-b2ac-80076349c184",
-//   "id_uuid": "678c6f12-302b-43eb-a6ae-a47b114eadb0",
-//   "type_object": "selected_marker",
-//   "handler_type": false,
-//   "folded": true,
-//   "hidden": false,
-//   "content": [
-//     {
-//       "id": "Маркер",
-//       "label": "Маркер",
-//       "type": "select",
-//       "value": "2/4",
-//       "read_only": false,
-//       "options": [
-//         {
-//           "id": "1/3",
-//           "label": "1/3"
-//         },
-//         {
-//           "id": "2/4",
-//           "label": "2/4"
-//         }
-//       ]
-//     }
-//   ],
-//   "target": "23db414f-0245-4275-bdc4-0903a713bda3",
-//   "description": "Маркер"
-// }
-
